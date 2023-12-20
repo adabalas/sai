@@ -1,0 +1,1538 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:math="http://www.w3.org/2005/xpath-functions/math">
+<xsl:output method="html"/>
+<xsl:template match="/">
+<style>
+.maindisplay {
+background-color: rgba( 0,0,0,0.01);
+padding-top:10px;
+min-width:600px;
+/*		overflow:auto;*/
+display:block;
+}
+
+.headerbar {
+background-color:#38A0D0;
+min-height:50px;
+margin-top:15px;
+margin-bottom:15px;
+padding:10px;
+display: flex;
+align-items: center;
+}
+
+.headerfont {
+color:#ffffff;
+font-size:28px;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+font-weight:100;
+}
+
+.headerret {
+width:48px;
+height:48px;
+background-color:transparent;
+border:none;
+vertical-align: middle;
+display:inline;
+padding-right: 3px;
+color: #FFFFFF;
+}
+
+.titletext {
+font-size:16px;
+color:#38A0D0;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.subtext {
+font-size:14px;
+color:#1C2022;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.subtext_mini {
+font-size:7px;
+color:#1C2022;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.subtext:link, .subtext:visited{
+text-decoration: none;
+color:#38A0D0;
+}
+
+.subtiles {
+border-radius: 5px;
+border-width: 1px;
+border-color: #D1D1D1;
+background-color: #FFFFFF;
+border-style: solid;
+padding: 15px;
+width: 180px;
+min-height: 50px;
+margin-top: 10px;
+margin-bottom: 10px;
+margin-right: 10px;
+margin-left: 10px;
+font-size:16px;
+font-weight: 500;
+color:#1C2022;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+display: inline-flex;
+text-decoration: none;
+box-sizing : border-box;
+}
+
+/* Styling for table headers (th elements) */
+.table th {
+background-color: #f2f2f2;
+text-align: left;
+padding: 8px;
+border: 1px solid #ddd; /* Add a border around header cells */
+}
+
+/* Styling for table rows (tr elements) */
+.table tr {
+background-color: #fff; /* White background for table rows */
+}
+
+/* Styling for table cells (td elements) */
+.table td {
+padding: 8px;
+border: 1px solid #ddd; /* Add a border around data cells */
+}
+
+/* Ensure header cells and data cells align properly */
+.table th,
+.table tr,
+.table td {
+/* width: 25%;  Adjust the width as needed to align with the header columns */
+box-sizing: border-box; /* Ensure consistent sizing and spacing */
+}
+
+.hidden {
+display: none;
+}
+
+/*the container must be positioned relative:*/
+.custom-select {
+position: relative;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+color: #1C2022;
+font-size: 14px;
+width:150px;
+height: 2.75rem;
+}
+
+.custom-select select {
+display: none; /*hide original SELECT element:*/
+}
+
+.select-selected {
+background-color: #f9f9f9;
+}
+
+/*style the arrow inside the select element:*/
+.select-selected:after {
+position: absolute;
+content: "";
+top: 18px;
+right: 10px;
+width: 0;
+height: 0;
+border: 6px solid transparent;
+border-color: #1C2022 transparent transparent transparent;
+}
+
+/*point the arrow upwards when the select box is open (active):*/
+.select-selected.select-arrow-active:after {
+border-color: transparent transparent #1C2022 transparent;
+top: 12px;
+}
+
+/*style the items (options), including the selected item:*/
+.select-selected {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+color: #1C2022;
+padding: .75rem .75rem;
+border: 1px solid transparent;
+border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+cursor: pointer;
+user-select: none;
+border: 1px solid #768ea2;
+border-radius: .25rem;
+background-color: #f9f9f9;
+}
+
+/*style the items (options), including the selected item:*/
+.select-items div {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+color: #1C2022;
+padding: .75rem .75rem;
+border: 1px solid transparent;
+border-color: rgba(0, 0, 0, 0.1);
+cursor: pointer;
+user-select: none;
+}
+
+/*style items (options):*/
+.select-items {
+position: absolute;
+background-color: #f9f9f9;
+top: 100%;
+left: 0;
+right: 0;
+z-index: 99;
+}
+
+/*hide the items when the select box is closed:*/
+.select-hide {
+display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+background-color: rgba(0, 0, 0, 0.1);
+}
+
+
+.subtext_bold {
+font-size:14px;
+color:#1C2022;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+font-weight: 600
+}
+
+.searchlinks:link, .searchlinks:visited {
+border: 1px solid #768ea2;
+display: inline-block;
+border-radius: .25rem;
+background-image: -webkit-linear-gradient(bottom, #E4E8EA 0%, #E8EBED 50%, #f1f3f4 96.36%, #FFFFFF 100%);
+vertical-align: middle;
+text-align: center;
+padding: .75rem;
+height: 1.25rem;
+min-width: 125px;
+margin-right: 10px;
+margin-top: 10px;
+text-decoration: none;
+font-size:14px;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+font-weight: 500;
+color: #1C2022;
+}
+
+.searchlinks:hover, .searchlinks:active {
+border: 1px solid #768ea2;
+display: inline-block;
+border-radius: .25rem;
+background-color: #f7f8f9;
+background-image: none;
+vertical-align: middle;
+text-align: center;
+padding: .75rem;
+height: 1.25rem;
+min-width: 125px;
+margin-right: 10px;
+margin-top: 10px;
+text-decoration: none;
+font-size:14px;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+font-weight: 500;
+color: #3379B7;
+}
+
+.popup {
+position: relative;
+display: inline-block;
+cursor: pointer;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+
+.popup .popuptext {
+visibility: hidden;
+width: 300px;
+background-color: #666D70;
+color: #fff;
+text-align: center;
+border-radius: .25rem;
+padding: 15px;
+position: absolute;
+z-index: 1;
+bottom: 125%;
+left: 50%;
+margin-left: -200px;
+}
+
+.popup .popuptext::after {
+content: "";
+position: absolute;
+top: 100%;
+left: 50%;
+margin-left: 30px;
+border-width: 5px;
+border-style: solid;
+border-color: #666D70 transparent transparent transparent;
+}
+
+.popup .show {
+visibility: visible;
+}
+
+</style>
+<html>
+<head>
+<title>Payslip Summary</title>
+
+</head>
+
+<body class="maindisplay">
+<div>
+<!--Define Variables for environment and Excel version-->
+<xsl:variable name="domainURL" select="DATA_DS/G_3/EXTERNAL_VIRTUAL_HOST"/>
+
+<!--Standard Header-->
+<xsl:variable name="imagepath" select="'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOYAAAAfCAYAAADz97FqAAAED0lEQVR42u2d0Y2kMAxAtwRKoID7oARKoAT+94ftIB1QAiVMCSkhJVACJXA7kkeaZQewEzsxOx7JH6cVxLHzguM4uY8P+9nvDX5f/z5bEAfSw79rrQrfFfQH0iPf05y8x8c8g5AbGLoVsk+KjtO3DCm6IfwzarErQtckIdqtAtuHb1lPZAFftSfvHCX798OfYPwjpR1hRjo0QMwzRFmgPxXzTMul2935DbH9M/94LXZF6JokBCDHhHb8HqDwt1VY/F8E8yEzFYAMYG6dX18IzGdAO61gQr8XpvacgSknrVIwH4O8vxiYD+m1gQlhNHebk4EpN/hrpWCi7KsUzOVVRFIKTCEof8FpYArOegrBXI++nErB3Gs3O5g5/WNg8kulHMx1b02sGMx1G43kBhMSPbNwH0f7Yu6sE3fEEQzVCYPpXohP/QIJg7ln14Gg+0DUdTpo91QSv9D3trv7ZALSQvZ2weYAIGR2J4LR4+j5/hJgMiRH0H3g6tdmRneETGGbC0zkniTJrlxjieCbJXY9vPHRdiIKsVl9toTk1cGE98wawdxs+C8x6+FSYMJ7AqXtnGAiJ44FCxh8yVYorEhZ+hiYhNi/KJhPcJ4OJGVgjorBnFKSajvv7Bj0ygam5OI918xeHEzCYGoUgXnDJkaQus6RZWp9RJQ0FypxNTAJiY5eCZgd1XEF15iNQPKHswpnpUwaBmYmMCGzhk2s1ErArAQSKr6gXZsSYCInjd7AFARTYiO8FJhIx2UBk0FCxrHkYraDDEzdYDYGZp46ZAPTwEwudSsUymJCsO4CYI6Zx5JLXRIYmHrA7JkMzQnmoCX5ww2lwuSP/+tgYsuoBiVgBs4whnHrAVXXqbhWdkac8M+5j+m5k34c14y8TYFBxHGkinkG5AITs4d5UwxmnWssMUZ6nvC+5umWCav8IRaIh5jBXRJM+FLeYsNvQTCpBfdeGZg117G/FzcfRN+A8ZYleeCMJeceVmS/GigmmAgF7HOkfzyDXSuknk4LmIRwdnd5A+Np4tT3bWtlkQmU5YvpWsKMZxu7UmASqpLWk5MaUiV5nilkf24fe47TU8bSWxexc4VeisCcEvzjGe2KCblDqQz/TptjBv+MBibOGdiQdrgAmCHRP5xgJoW0hcCskLkHEf8YmIVCWmEwJwb/cNfKRoe0BS/jkoIzUDO0dh4TH9IGhWAu2K95idMlyJB23g7awtdXVsx38viYbRMDkxbSOiVgkm+KLwQmNqQdtYC50SH10ueU8WJgEkLa6GJ2BjDD4yIooY10qfOY2JC21QTm04Q9EgF9FBekLn3YwKxPSu1q5HuqiFvOyM8cwNNy9CNGxx3h+i8aamo7peyK0DVJEiZWd7AN4ziuFCHYDBUt/QcxaMk1J/xMlgAAAABJRU5ErkJggg=='" />
+
+<xsl:element name="a">
+<xsl:attribute name = "href">
+<xsl:text>https://</xsl:text><xsl:value-of select="$domainURL"/><xsl:text>/homePage/faces/FuseWelcome</xsl:text>
+</xsl:attribute>
+<xsl:element name="IMG">
+<xsl:attribute name="src">
+<xsl:value-of select="$imagepath"/>
+</xsl:attribute>
+</xsl:element>
+</xsl:element>
+<div class="headerbar">
+<span class="headerfont">
+Payslip Summary
+</span>
+</div>
+
+<!--Search section-->
+<div style="display: block; width:100%; margin-bottom: 40px; margin-top: 30px;">
+<div>
+<xsl:variable name="paramPaySelect"><xsl:value-of select="substring(DATA_DS/P_PAY_DATE,6,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,9,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,1,4)" disable-output-escaping="yes"/></xsl:variable>
+
+<script>
+let jsDomain = "<xsl:value-of select="DATA_DS/G_17/EXTERNAL_VIRTUAL_HOST" disable-output-escaping="yes"/>";
+</script>
+
+<!--Display search options-->
+<form>
+<div style="display: inline-block; vertical-align: top;">
+<div style="width: 425px;">
+<div style="display: inline-flex; width: 375px; padding:10px 40px 10px 40px;">
+<div style="margin-top: auto; margin-bottom: auto;">
+<label class="subtext_bold" for="paySelect">
+Select Pay:
+</label>
+</div>
+<div style="margin-left: auto; margin-right: 10px;">
+<div class="custom-select" id="paySelectDiv">
+<select id="paySelect" name="paySelect">
+
+<xsl:for-each select="DATA_DS/G_6">
+
+<xsl:choose>
+<xsl:when test="($paramPaySelect = PAY_END_DATE)">
+<option value="{PAY_END_DATE}" selected="selected"><xsl:value-of select="PAY_END_DATE" disable-output-escaping="yes"/></option>
+</xsl:when>
+<xsl:otherwise>
+<option value="{PAY_END_DATE}"><xsl:value-of select="PAY_END_DATE" disable-output-escaping="yes"/></option>
+</xsl:otherwise>
+</xsl:choose>
+</xsl:for-each>
+</select>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!--Link to submit form (regenerate report with selected options)-->
+<div style="display: inline-block; padding-left: 30px; vertical-align: top;">
+<a href="#" class="searchlinks" onclick="location.reload();location.href='https://' + jsDomain + '/xmlpserver/Custom/Human%20Capital%20Management/Payroll/Payroll%20-%20Earnings/PAYROLL%20SUMMARY/payroll%20summary.xdo?_paramsP_PAY_DATE=' + document.getElementById('paySelect').value + '&amp;_xf=html&amp;_xautorun=true&amp;_xpt=1'">Search</a>
+
+
+</div>
+</form>
+</div>
+</div>
+
+<!--Display sections-->
+<div style="width:100%; min-height: calc(100% - 130px);">
+<div style="margin-left: 5px; margin-right: 5px; padding-top: 40px; padding-bottom: 20px; padding-left: 20px; padding-right: 40px; max-width: 1500px;">
+<div>
+<div>
+<div class="subtiles" >
+<div style="display:block">
+<div>
+<span class="subtext">Person Number = <xsl:value-of select="DATA_DS/G_7/PERSON_NUMBER" disable-output-escaping="yes"/><br/>Name = <xsl:value-of select="DATA_DS/G_7/FULL_NAME" disable-output-escaping="yes"/>
+<br/></span>
+</div>
+</div>
+</div>
+
+<div class="subtiles" >
+<div style="display:block">
+<div style="margin-bottom:10px">
+<span class="titletext">Gross Earnings</span><br/>
+</div>
+<div>
+<span class="subtext">
+$<xsl:value-of select="DATA_DS/G_7/GROSS_EARNS" disable-output-escaping="yes"/></span>
+</div>
+</div>
+</div>
+
+<div class="subtiles" >
+<div style="display:block">
+<div style="margin-bottom:10px">
+<span class="titletext">Imputed Earnings</span><br/>
+</div>
+<div>
+<span class="subtext"></span>
+$<xsl:value-of select="DATA_DS/G_7/IMPUTED_EARNS" disable-output-escaping="yes"/>
+</div>
+</div>
+</div>
+
+<div class="subtiles" >
+<div style="display:block">
+<div style="margin-bottom:10px">
+<span class="titletext">Pretax Deducation</span><br/>
+</div>
+<div>
+<span class="subtext"></span>
+$<xsl:value-of select="DATA_DS/G_7/PRETAX_DED" disable-output-escaping="yes"/>
+</div>
+</div>
+</div>
+
+<div class="subtiles" >
+<div style="display:block">
+<div style="margin-bottom:10px">
+<span class="titletext">Employe Tax Deducation</span><br/>
+</div>
+<div>
+<span class="subtext"></span>
+$<xsl:value-of select="DATA_DS/G_7/TAX_DED" disable-output-escaping="yes"/>
+</div>
+</div>
+</div>
+
+<div class="subtiles" >
+<div style="display:block">
+<div style="margin-bottom:10px">
+<span class="titletext">Involuntary Deducation</span><br/>
+</div>
+<div>
+<span class="subtext"></span>
+$<xsl:value-of select="DATA_DS/G_7/INVOL_DED" disable-output-escaping="yes"/>
+</div>
+</div>
+</div>
+
+<div class="subtiles" >
+<div style="display:block">
+<div style="margin-bottom:10px">
+<span class="titletext">Voluntary Deducation</span><br/>
+</div>
+<div>
+<span class="subtext"></span>
+$<xsl:value-of select="DATA_DS/G_7/VOL_DED" disable-output-escaping="yes"/>
+</div>
+</div>
+</div>
+
+<div class="subtiles" >
+<div style="display:block">
+<div style="margin-bottom:10px">
+<span class="titletext">Net Pay</span><br/>
+</div>
+<div>
+<span class="subtext"></span>
+$<xsl:value-of select="DATA_DS/G_7/NET_PAY" disable-output-escaping="yes"/>
+</div>
+</div>
+</div>
+
+
+<table class="table">
+<!-- Group 1 -->
+<thead>
+<tr>
+<th>Balance Totals</th>
+<th>Hours</th>
+<th>Paid Hourly rate</th>
+<th>Gross Earnings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="13">
+<button id="toggleRegular" onclick="toggleSection('Regular', 'toggleRegular')">+</button> Regular
+</td>
+</tr>
+<tbody id="Regular" style="display: none;">
+<xsl:variable name="countRowsA" select="count(DATA_DS/G_3)"/>
+<xsl:for-each select="DATA_DS/G_3">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"A",</xsl:text>
+                <xsl:value-of select="$countRowsA"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"A",</xsl:text><xsl:value-of select="$countRowsA"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupA</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleofftime" onclick="toggleSection('Off Time', 'toggleofftime')">+</button> Off Time
+</td>
+</tr>
+<tbody id="Off Time" style="display: none;">
+<xsl:variable name="countRowsB" select="count(DATA_DS/G_2)"/>
+<xsl:for-each select="DATA_DS/G_2">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+</td>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"B",</xsl:text>
+                <xsl:value-of select="$countRowsB"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"B",</xsl:text><xsl:value-of select="$countRowsB"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupB</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleotcall" onclick="toggleSection('OT Call', 'toggleotcall')">+</button> OT Call
+</td>
+</tr>
+<tbody id="OT Call" style="display: none;">
+<xsl:variable name="countRowsC" select="count(DATA_DS/G_4)"/>
+<xsl:for-each select="DATA_DS/G_4">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+</td>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"C",</xsl:text>
+                <xsl:value-of select="$countRowsC"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"C",</xsl:text><xsl:value-of select="$countRowsC"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupC</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="togglePTO" onclick="toggleSection('PTO', 'togglePTO')">+</button> PTO
+</td>
+</tr>
+<tbody id="PTO" style="display: none;">
+<xsl:variable name="countRowsD" select="count(DATA_DS/G_11)"/>
+<xsl:for-each select="DATA_DS/G_11">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"D",</xsl:text>
+                <xsl:value-of select="$countRowsD"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"D",</xsl:text><xsl:value-of select="$countRowsD"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupD</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleRetro" onclick="toggleSection('Retro', 'toggleRetro')">+</button> Retro
+</td>
+</tr>
+<tbody id="Retro" style="display: none;">
+<xsl:variable name="countRowsE" select="count(DATA_DS/G_8)"/>
+<xsl:for-each select="DATA_DS/G_8">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"E",</xsl:text>
+                <xsl:value-of select="$countRowsE"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"E",</xsl:text><xsl:value-of select="$countRowsE"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupE</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleSpecialPay" onclick="toggleSection('Special Pay', 'toggleSpecialPay')">+</button> Special Pay
+</td>
+</tr>
+<tbody id="Special Pay" style="display: none;">
+<xsl:variable name="countRowsF" select="count(DATA_DS/G_9)"/>
+<xsl:for-each select="DATA_DS/G_9">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"F",</xsl:text>
+                <xsl:value-of select="$countRowsF"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"F",</xsl:text><xsl:value-of select="$countRowsF"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupF</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleOther" onclick="toggleSection('Other', 'toggleOther')">+</button> Other
+</td>
+</tr>
+<tbody id="Other" style="display: none;">
+<xsl:variable name="countRowsG" select="count(DATA_DS/G_10)"/>
+<xsl:for-each select="DATA_DS/G_10">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"G",</xsl:text>
+                <xsl:value-of select="$countRowsG"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"G",</xsl:text><xsl:value-of select="$countRowsG"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupG</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+
+<tr>
+<td colspan="13">
+<button id="toggleOvertimeOffshift" onclick="toggleSection('Overtime Offshift', 'toggleOvertimeOffshift')">+</button> Overtime Offshift
+</td>
+</tr>
+<tbody id="Overtime Offshift" style="display: none;">
+<xsl:variable name="countRowsI" select="count(DATA_DS/G_13)"/>
+<xsl:for-each select="DATA_DS/G_13">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"I",</xsl:text>
+                <xsl:value-of select="$countRowsI"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"I",</xsl:text><xsl:value-of select="$countRowsI"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupI</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleOvertime" onclick="toggleSection('Overtime', 'toggleOvertime')">+</button> Overtime
+</td>
+</tr>
+<tbody id="Overtime" style="display: none;">
+<xsl:variable name="countRowsZ" select="count(DATA_DS/G_12)"/>
+<xsl:for-each select="DATA_DS/G_12">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"Z",</xsl:text>
+                <xsl:value-of select="$countRowsZ"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"Z",</xsl:text><xsl:value-of select="$countRowsZ"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupZ</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleCall" onclick="toggleSection('Call', 'toggleCall')">+</button> Call
+</td>
+</tr>
+<tbody id="Call" style="display: none;">
+<xsl:variable name="countRowsJ" select="count(DATA_DS/G_14)"/>
+<xsl:for-each select="DATA_DS/G_14">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"J",</xsl:text>
+                <xsl:value-of select="$countRowsJ"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"J",</xsl:text><xsl:value-of select="$countRowsJ"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupJ</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleExtraShiftBonus" onclick="toggleSection('Extra Shift Bonus', 'toggleExtraShiftBonus')">+</button> Extra Shift Bonus
+</td>
+</tr>
+<tbody id="Extra Shift Bonus" style="display: none;">
+<xsl:variable name="countRowsK" select="count(DATA_DS/G_15)"/>
+<xsl:for-each select="DATA_DS/G_15">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"K",</xsl:text>
+                <xsl:value-of select="$countRowsK"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"K",</xsl:text><xsl:value-of select="$countRowsK"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupK</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+<tr>
+<td colspan="13">
+<button id="toggleICIBonus" onclick="toggleSection('ICI Bonus', 'toggleICIBonus')">+</button> ICI Bonus
+</td>
+</tr>
+<tbody id="ICI Bonus" style="display: none;">
+<xsl:variable name="countRowsL" select="count(DATA_DS/G_16)"/>
+<xsl:for-each select="DATA_DS/G_16">
+<tr>
+<td>
+<xsl:value-of select="ELEMENT_NAME" disable-output-escaping="yes"/>
+<xsl:choose>
+    <xsl:when test="INSTR_TEXT = ''">
+        <xsl:element name="div">
+            <xsl:attribute name="class">popup</xsl:attribute>
+            <xsl:attribute name="onclick">
+                <xsl:text>myFunction(</xsl:text>
+                <xsl:value-of select="position()"/>
+                <xsl:text>,"L",</xsl:text>
+                <xsl:value-of select="$countRowsL"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+            <!-- Your SVG and other elements -->
+        </xsl:element>
+    </xsl:when>
+    <xsl:otherwise>
+<xsl:element name="div">
+<xsl:attribute name="class">
+popup
+</xsl:attribute>
+<xsl:attribute name="onclick">
+<xsl:text>myFunction(</xsl:text><xsl:value-of select="position()"/><xsl:text>,"L",</xsl:text><xsl:value-of select="$countRowsL"/><xsl:text>)</xsl:text>
+</xsl:attribute>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 15 15" xml:space="preserve">
+<g transform="matrix(1 0 0 1 7.5 7.5)" id="MTcQhLXHwtpaJvfC6Ifjv"  >
+<path style="stroke: rgb(52,164,136); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(56,160,208); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-7.5, -7.5)" d="M 7.5 0 C 11.64 0 15 3.36 15 7.5 C 15 11.64 11.64 15 7.5 15 C 3.3600000000000003 15 0 11.64 0 7.5 C 0 3.3600000000000003 3.36 0 7.5 0 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 7.67 8.41)" style="" id="wg0dzjiGCZaKP2piY6W_Z">
+<text xml:space="preserve" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" font-style="normal" font-weight="bold" letter-spacing="0.026" line-height="1" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-3.1" y="3.43">?</tspan></text>
+</g>
+</svg>
+<xsl:element name="span">
+<xsl:attribute name="class">
+popuptext
+</xsl:attribute>
+<xsl:attribute name="id">
+<xsl:text>myPopupL</xsl:text><xsl:value-of select="position()"/>
+</xsl:attribute>
+<xsl:value-of select="INSTR_TEXT" disable-output-escaping="yes"/>
+</xsl:element>
+</xsl:element>
+</xsl:otherwise>
+</xsl:choose>
+
+</td>
+<td>
+<xsl:value-of select="TOTAL_HOURS" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="RATE" disable-output-escaping="yes"/>
+</td>
+<td>
+$<xsl:value-of select="TOTAL_RESULT_VALUE" disable-output-escaping="yes"/>
+</td>
+</tr>
+</xsl:for-each>
+</tbody>
+</tbody>
+
+
+<tfoot>
+<tr>
+<th>Total</th>
+<th><xsl:value-of select="DATA_DS/G_1/H_SUM" disable-output-escaping="yes"/></th>
+<!--<th><xsl:value-of select="DATA_DS/G_1/RATE" disable-output-escaping="yes"/></th>-->
+<th><xsl:value-of select="DATA_DS/G_1/NULL" disable-output-escaping="yes"/></th>
+<th><xsl:value-of select="DATA_DS/G_1/T_RESULT_VALUE" disable-output-escaping="yes"/></th>
+</tr>
+</tfoot>
+</table>
+
+<div style="width:100%; height:100%;">
+<xsl:element name="iframe">
+<xsl:attribute name="src">
+<xsl:text>https://hdbz-dev2.fa.us2.oraclecloud.com/xmlpserver/Custom/Human%20Capital%20Management/Payroll/Payroll%20-%20Earnings/PAYROLL%20SUMMARY/PAID_HOURS_PIE.xdo?_paramsP_END_DATE=</xsl:text>
+<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,6,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,9,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,1,4)" disable-output-escaping="yes"/>
+<xsl:text>&amp;_xf=html&amp;_xautorun=true&amp;_xpt=1</xsl:text>
+
+</xsl:attribute>
+<xsl:attribute name="width">
+100%
+</xsl:attribute>
+<xsl:attribute name="height">
+100%
+</xsl:attribute>
+<xsl:attribute name="title">
+Chart Example
+</xsl:attribute>
+<xsl:attribute name="style">
+border:none;
+</xsl:attribute>
+</xsl:element>
+</div>
+
+<div style="width:100%; height:100%;">
+<xsl:element name="iframe">
+<xsl:attribute name="src">
+<xsl:text>https://hdbz-dev2.fa.us2.oraclecloud.com/xmlpserver/Custom/Human%20Capital%20Management/Payroll/Payroll%20-%20Earnings/PAYROLL%20SUMMARY/Earnings_pie.xdo?_paramsP_END_DATE=</xsl:text>
+<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,6,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,9,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,1,4)" disable-output-escaping="yes"/>
+<xsl:text>&amp;_xf=html&amp;_xautorun=true&amp;_xpt=1</xsl:text>
+
+</xsl:attribute>
+<xsl:attribute name="width">
+100%
+</xsl:attribute>
+<xsl:attribute name="height">
+100%
+</xsl:attribute>
+<xsl:attribute name="title">
+Chart Example
+</xsl:attribute>
+<xsl:attribute name="style">
+border:none;
+</xsl:attribute>
+</xsl:element>
+</div>
+
+
+<div style="width:100%; height:100%;">
+<xsl:element name="iframe">
+<xsl:attribute name="src">
+<xsl:text>https://hdbz-dev2.fa.us2.oraclecloud.com/xmlpserver/Custom/Human%20Capital%20Management/Payroll/Payroll%20-%20Earnings/PAYROLL%20SUMMARY/Gross%20Pay%20Pie.xdo?_paramsP_END_DATE=</xsl:text>
+<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,6,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,9,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,1,4)" disable-output-escaping="yes"/>
+<xsl:text>&amp;_xf=html&amp;_xautorun=true&amp;_xpt=1</xsl:text>
+
+</xsl:attribute>
+<xsl:attribute name="width">
+100%
+</xsl:attribute>
+<xsl:attribute name="height">
+100%
+</xsl:attribute>
+<xsl:attribute name="title">
+Chart Example
+</xsl:attribute>
+<xsl:attribute name="style">
+border:none;
+</xsl:attribute>
+</xsl:element>
+</div>
+
+<div style="width:100%; height:100%;">
+<xsl:element name="iframe">
+<xsl:attribute name="src">
+<xsl:text>https://hdbz-dev2.fa.us2.oraclecloud.com/xmlpserver/Custom/Human%20Capital%20Management/Payroll/Payroll%20-%20Earnings/PAYROLL%20SUMMARY/HOURS_PAY_END.xdo?_paramsP_END_DATE=</xsl:text>
+<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,6,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,9,2)" disable-output-escaping="yes"/>-<xsl:value-of select="substring(DATA_DS/P_PAY_DATE,1,4)" disable-output-escaping="yes"/>
+<xsl:text>&amp;_xf=html&amp;_xautorun=true&amp;_xpt=1</xsl:text>
+
+</xsl:attribute>
+<xsl:attribute name="width">
+100%
+</xsl:attribute>
+<xsl:attribute name="height">
+100%
+</xsl:attribute>
+<xsl:attribute name="title">
+Chart Example
+</xsl:attribute>
+<xsl:attribute name="style">
+border:none;
+</xsl:attribute>
+</xsl:element>
+</div>
+
+
+
+<!--This javascript creates the custom dropdown search box-->
+<script>
+<![CDATA[
+var x, i, j, l, ll, selElmnt, a, b, c;
+/*look for any elements with the class "custom-select":*/
+x = document.getElementsByClassName("custom-select");
+l = x.length;
+for (i = 0; i < l; i++) {
+selElmnt = x[i].getElementsByTagName("select")[0];
+ll = selElmnt.length;
+/*for each element, create a new DIV that will act as the selected item:*/
+a = document.createElement("DIV");
+a.setAttribute("class", "select-selected");
+a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+x[i].appendChild(a);
+/*for each element, create a new DIV that will contain the option list:*/
+b = document.createElement("DIV");
+b.setAttribute("class", "select-items select-hide");
+for (j = 0; j < ll; j++) {
+/*for each option in the original select element,
+create a new DIV that will act as an option item:*/
+c = document.createElement("DIV");
+c.innerHTML = selElmnt.options[j].innerHTML;
+c.addEventListener("click", function(e) {
+/*when an item is clicked, update the original select box,
+and the selected item:*/
+var y, i, k, s, h, sl, yl;
+s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+sl = s.length;
+h = this.parentNode.previousSibling;
+for (i = 0; i < sl; i++) {
+if (s.options[i].innerHTML == this.innerHTML) {
+s.selectedIndex = i;
+h.innerHTML = this.innerHTML;
+y = this.parentNode.getElementsByClassName("same-as-selected");
+yl = y.length;
+for (k = 0; k < yl; k++) {
+y[k].removeAttribute("class");
+}
+this.setAttribute("class", "same-as-selected");
+break;
+}
+}
+h.click();
+});
+b.appendChild(c);
+}
+x[i].appendChild(b);
+a.addEventListener("click", function(e) {
+/*when the select box is clicked, close any other select boxes,
+and open/close the current select box:*/
+e.stopPropagation();
+closeAllSelect(this);
+this.nextSibling.classList.toggle("select-hide");
+this.classList.toggle("select-arrow-active");
+});
+}
+function closeAllSelect(elmnt) {
+/*a function that will close all select boxes in the document,
+except the current select box:*/
+var x, y, i, xl, yl, arrNo = [];
+x = document.getElementsByClassName("select-items");
+y = document.getElementsByClassName("select-selected");
+xl = x.length;
+yl = y.length;
+for (i = 0; i < yl; i++) {
+if (elmnt == y[i]) {
+arrNo.push(i)
+} else {
+y[i].classList.remove("select-arrow-active");
+}
+}
+for (i = 0; i < xl; i++) {
+if (arrNo.indexOf(i)) {
+x[i].classList.add("select-hide");
+}
+}
+}
+/*if the user clicks anywhere outside the select box,
+then close all select boxes:*/
+document.addEventListener("click", closeAllSelect);
+]]>
+</script>
+
+<script>
+// When the user clicks on div, open the popup
+<![CDATA[
+var currentPopup = null;
+
+function myFunction(rowVal, rowType, countRows) {
+    var elName = "myPopup" + rowType + rowVal;
+    var popup = document.getElementById(elName);
+
+    // Toggle popup visibility
+    if (popup.classList.contains("show")) {
+        popup.classList.remove("show");
+        currentPopup = null; // Reset currentPopup if the popup is closed
+    } else {
+        // Hide the currently open popup, if any
+        if (currentPopup !== null) {
+            currentPopup.classList.remove("show");
+        }
+
+        popup.classList.add("show");
+        currentPopup = popup; // Set the current popup as the one just opened
+    }
+}
+]]>
+</script>
+
+<script type="text/javascript">
+function toggleSection(sectionId, buttonId) {
+var section = document.getElementById(sectionId);
+var button = document.getElementById(buttonId);
+
+if (section.style.display === "none" || section.style.display === "") {
+section.style.display = "table-row-group"; // Use "table-row-group" for the tbody
+button.textContent = "-";
+} else {
+section.style.display = "none";
+button.textContent = "+";
+}
+}
+
+</script>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
+</xsl:template>
+</xsl:stylesheet>
